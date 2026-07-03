@@ -58,9 +58,9 @@ function tpClass(status) {
   return m[status] || 'tp-default'
 }
 
-async function fetchDetail() {
+async function fetchDetail(skipCache) {
   try {
-    const res = await submissionsApi.getDetail(route.params.id)
+    const res = await submissionsApi.getDetail(route.params.id, skipCache)
     if (res.code === 0) {
       submission.value = res.data
       document.title = `提交 #${res.data.submission_id} - QuickOJ`
@@ -86,23 +86,11 @@ function startPolling() {
         submission.value.run_time = res.data.run_time
         submission.value.run_memory = res.data.run_memory
         submission.value.judged_at = res.data.judged_at
-        // 将完成的测试点合并到已有列表，或按 total_count 初始化全部 Pending 网格
-        const done = res.data.judged_result || []
-        const total = res.data.total_count || done.length
-        if (!submission.value.judged_result && total > 0) {
-          // 首次拿到 total_count：初始化全部 Pending 占位
-          submission.value.judged_result = Array.from({length: total}, (_, i) =>
-            ({name: String(i + 1), status: 'Pending', time_used: null, memory_used_kb: 0}))
+        if (isFinal(res.data.status)) {
+          clearInterval(pollTimer); pollTimer = null
+          // 终态时完整加载一次（跳过缓存），获取全部样例结果
+          fetchDetail(true)
         }
-        if (submission.value.judged_result) {
-          const merged = [...submission.value.judged_result]
-          for (const d of done) {
-            const idx = merged.findIndex(t => t.name === d.name)
-            if (idx >= 0) merged[idx] = d
-          }
-          submission.value.judged_result = merged
-        }
-        if (isFinal(res.data.status)) { clearInterval(pollTimer); pollTimer = null }
       }
     } catch { /* ignore */ }
   }, CONFIG.SUBMISSION_DETAIL_POLL_INTERVAL)

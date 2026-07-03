@@ -77,24 +77,6 @@ def get_submission_status(
     db: Session = Depends(get_db),
 ):
     try:
-        # 优先从内存缓存读取中间结果
-        from app.services.judge_service import get_partial_result
-        from app.models.submission import Submission as SubModel
-        partial = get_partial_result(submission_id)
-        # 查一次 DB 获取真实状态（终态判断依赖它）
-        sub = db.query(SubModel).filter(SubModel.submission_id == submission_id).first()
-        if partial:
-            tests = partial.get("tests", [])
-            done = [t for t in tests if t.get("status") != "Pending"]
-            return success(data={
-                "submission_id": submission_id,
-                "status": sub.status if sub else "running",
-                "run_time": int(partial.get("run_time", 0)),
-                "run_memory": int(partial.get("run_memory", 0)),
-                "judged_at": sub.judged_at.isoformat() if sub and sub.judged_at else None,
-                "total_count": len(tests),
-                "judged_result": done,
-            })
         data = submission_service.get_submission_status(db, submission_id, current_user)
         return success(data=data)
     except Exception as e:
