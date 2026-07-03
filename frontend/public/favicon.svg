@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <!-- background rounded square -->
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)"/>
+  <!-- Q letter -->
+  <text x="32" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="900" fill="#ffffff">Q</text>
+  <!-- lightning bolt accent -->
+  <polygon points="46,26 40,32 44,32 38,42 48,30 42,30" fill="url(#bolt)" stroke="#4f46e5" stroke-width="0.5"/>
+</svg>
